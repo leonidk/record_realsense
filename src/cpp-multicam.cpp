@@ -73,8 +73,8 @@ int main(int argc, char * argv[]) try
         dev->enable_stream(rs::stream::color, rgb_w, rgb_h, rs::format::rgb8, 30);
         dev->start();
         dev->set_option(rs::option::r200_lr_auto_exposure_enabled,1);
-        dev->set_option(rs::option::color_enable_auto_exposure,1);
-        dev->set_option(rs::option::color_enable_auto_white_balance,1);
+        //dev->set_option(rs::option::color_enable_auto_exposure,1);
+        //dev->set_option(rs::option::color_enable_auto_white_balance,1);
         std::cout << "done." << std::endl;
 
         {

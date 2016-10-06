@@ -16,9 +16,14 @@ RCOMPILE_FLAGS = -D NDEBUG
 # Additional debug-specific flags
 DCOMPILE_FLAGS = -D DEBUG
 # Add additional include paths
-INCLUDES = -I $(SRC_PATH)
-# General linker settings
+ifeq ($(uname_S),Darwin)
+# OSX uses OpenGL as a framework
+INCLUDES = -I $(SRC_PATH) -I /usr/local/share -I src/third_party
+LINK_FLAGS = -lrealsense -framework OpenGL
+else
+INCLUDES = -I $(SRC_PATH) -I src/third_party
 LINK_FLAGS = -lGL -lrealsense
+endif
 # Additional release-specific linker settings
 RLINK_FLAGS =
 # Additional debug-specific linker settings
