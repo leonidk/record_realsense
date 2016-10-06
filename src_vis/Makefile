@@ -1,13 +1,15 @@
 #### PROJECT SETTINGS ####
+
+# Obtains the OS type, either 'Darwin' (OS X) or 'Linux'
 UNAME_S:=$(shell uname -s)
 # The name of the executable to be created
-BIN_NAME := record_realsense
+BIN_NAME := vis
 # Compiler used
 CXX ?= g++
 # Extension of source files used in the project
 SRC_EXT = cpp
 # Path to the source directory, relative to the makefile
-SRC_PATH = src
+SRC_PATH = .
 # Space-separated pkg-config libraries used by this project
 LIBS =  
 # General compiler flags
@@ -17,14 +19,13 @@ RCOMPILE_FLAGS = -D NDEBUG
 # Additional debug-specific flags
 DCOMPILE_FLAGS = -D DEBUG
 # Add additional include paths
-ifeq ($(UNAME_S),Darwin)
-# OSX uses OpenGL as a framework
-INCLUDES = -I $(SRC_PATH) -I /usr/local/share -I src/third_party
-LINK_FLAGS = -lrealsense -framework OpenGL -lglfw3
-endif
 ifeq ($(UNAME_S),Linux)
-INCLUDES = -I $(SRC_PATH) -I src/third_party
-LINK_FLAGS = -lGL -lrealsense -lglfw
+# OSX uses OpenGL as a framework
+	INCLUDES = -I $(SRC_PATH) -I src/third_party
+	LINK_FLAGS = -lGL -lrealsense -lglfw
+else
+	INCLUDES = -I $(SRC_PATH) -I /usr/local/share -I src/third_party
+	LINK_FLAGS = -lrealsense -framework OpenGL -lglfw3
 endif
 # Additional release-specific linker settings
 RLINK_FLAGS =
@@ -37,8 +38,6 @@ INSTALL_PREFIX = usr/local
 #### END PROJECT SETTINGS ####
 
 # Generally should not need to edit below this line
-
-# Obtains the OS type, either 'Darwin' (OS X) or 'Linux'
 
 # Function used to check variables. Use on the command line:
 # make print-VARNAME

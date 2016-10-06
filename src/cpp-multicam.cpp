@@ -44,6 +44,20 @@ int main(int argc, char * argv[]) try
         std::cout << "Note: Recording is always 30Hz and using autoexposure\n";
         return 0;
     }
+    if(argc > 1)     
+        prefix_name = argv[1];
+    if(argc > 2)     
+        max_cameras = atoi(argv[2]);
+    if(argc > 3)     
+        using_rect = atoi(argv[3]);
+    if(argc > 4)     
+        rgb_w = atoi(argv[4]);
+    if(argc > 5)     
+        rgb_h = atoi(argv[5]);
+    if(argc > 6)     
+        z_w = atoi(argv[6]);
+    if(argc > 7)     
+        z_h = atoi(argv[7]);
     rs::log_to_console(rs::log_severity::warn);
     //rs::log_to_file(rs::log_severity::debug, "librealsense.log");
 
@@ -64,6 +78,7 @@ int main(int argc, char * argv[]) try
     }
     std::vector<std::pair<std::ofstream,std::ofstream>> recordings(devices.size());
     // Configure and start our devices
+    raw_header hd, hd2;
     for(int i=0; i < devices.size(); i++)
     {
         auto dev = devices[i];
@@ -95,9 +110,9 @@ int main(int argc, char * argv[]) try
         {
             recordings[i].first.open(prefix_name + "_" + std::to_string(timestamp) + "_depth_" +std::to_string(i) + ".rec", std::ios::binary);
             recordings[i].second.open(prefix_name + "_" + std::to_string(timestamp) + "_color_" +std::to_string(i) + ".rec", std::ios::binary);
-            raw_header hd = {dev->get_stream_width(stream_type_depth), dev->get_stream_height(stream_type_depth), 1, 2};
+            hd = {dev->get_stream_width(stream_type_depth), dev->get_stream_height(stream_type_depth), 1, 2};
             recordings[i].first.write((char*)&hd,sizeof(raw_header));
-            raw_header hd2 = {dev->get_stream_width(stream_type_color), dev->get_stream_height(stream_type_color), 3, 1};
+            hd2 = {dev->get_stream_width(stream_type_color), dev->get_stream_height(stream_type_color), 3, 1};
             recordings[i].second.write((char*)&hd2,sizeof(raw_header));
             
         }
@@ -138,17 +153,17 @@ int main(int argc, char * argv[]) try
         for(int idx=0; idx < devices.size(); idx++)
         {
             auto dev = devices[idx];
-            auto newdata = dev->poll_for_frames();
-            if(newdata) {
+             dev->wait_for_frames();
+            const auto c = dev->get_stream_intrinsics(rs::stream::color), d = dev->get_stream_intrinsics(rs::stream::depth);
+            if(true) {
                 uint32_t ts = std::time(0);
                 auto depth = dev->get_frame_data(stream_type_depth);
                 auto color = dev->get_frame_data(stream_type_color);
                 recordings[idx].first.write((char*)&ts,sizeof(uint32_t));
-                recordings[idx].first.write((char*)depth,z_w*z_h*2);
+                recordings[idx].first.write((char*)depth,hd.width*hd.height*2);
                 recordings[idx].second.write((char*)&ts,sizeof(uint32_t));
-                recordings[idx].second.write((char*)color,rgb_w*rgb_h*3);
+                recordings[idx].second.write((char*)color,hd2.width*hd2.height*3);
             }
-            const auto c = dev->get_stream_intrinsics(rs::stream::color), d = dev->get_stream_intrinsics(rs::stream::depth);
             buffers[i++].show(*dev, rs::stream::color, x, 0, perTextureWidth, perTextureHeight);
             buffers[i++].show(*dev, rs::stream::depth, x, perTextureHeight, perTextureWidth, perTextureHeight);
             x += perTextureWidth;
