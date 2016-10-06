@@ -135,18 +135,18 @@ int main(int argc, char * argv[]) try
         glOrtho(0, w, h, 0, -1, +1);
         glPixelZoom(1, -1);
         int i=0, x=0;
-        for(int i=0; i < devices.size(); i++)
+        for(int idx=0; idx < devices.size(); idx++)
         {
-            auto dev = devices[i];
-            dev->wait_for_frames();
-            {
+            auto dev = devices[idx];
+            auto newdata = dev->poll_for_frames();
+            if(newdata) {
                 uint32_t ts = std::time(0);
                 auto depth = dev->get_frame_data(stream_type_depth);
                 auto color = dev->get_frame_data(stream_type_color);
-                recordings[i].first.write((char*)&ts,sizeof(uint32_t));
-                recordings[i].first.write((char*)depth,z_w*z_h*2);
-                recordings[i].second.write((char*)&ts,sizeof(uint32_t));
-                recordings[i].second.write((char*)color,rgb_w*rgb_h*3);
+                recordings[idx].first.write((char*)&ts,sizeof(uint32_t));
+                recordings[idx].first.write((char*)depth,z_w*z_h*2);
+                recordings[idx].second.write((char*)&ts,sizeof(uint32_t));
+                recordings[idx].second.write((char*)color,rgb_w*rgb_h*3);
             }
             const auto c = dev->get_stream_intrinsics(rs::stream::color), d = dev->get_stream_intrinsics(rs::stream::depth);
             buffers[i++].show(*dev, rs::stream::color, x, 0, perTextureWidth, perTextureHeight);
