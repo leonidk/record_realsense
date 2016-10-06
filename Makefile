@@ -8,7 +8,7 @@ SRC_EXT = cpp
 # Path to the source directory, relative to the makefile
 SRC_PATH = .
 # Space-separated pkg-config libraries used by this project
-LIBS = glfw3 
+LIBS =  
 # General compiler flags
 COMPILE_FLAGS = -std=c++11 -Wall -Wextra -g
 # Additional release-specific flags
@@ -18,11 +18,11 @@ DCOMPILE_FLAGS = -D DEBUG
 # Add additional include paths
 ifeq ($(uname_S),Darwin)
 # OSX uses OpenGL as a framework
-INCLUDES = -I $(SRC_PATH) -I /usr/local/share -I src/third_party
-LINK_FLAGS = -lrealsense -framework OpenGL
-else
 INCLUDES = -I $(SRC_PATH) -I src/third_party
-LINK_FLAGS = -lGL -lrealsense
+LINK_FLAGS = -lGL -lrealsense -lglfw
+else
+INCLUDES = -I $(SRC_PATH) -I /usr/local/share -I src/third_party
+LINK_FLAGS = -lrealsense -framework OpenGL -lglfw3
 endif
 # Additional release-specific linker settings
 RLINK_FLAGS =
