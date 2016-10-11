@@ -18,7 +18,7 @@ int main(int argc, char * argv[])
     if(argc == 1)
         return 0;
     name = argv[1];
-    auto inf = std::ifstream(name, std::ios::binary);
+    std::ifstream inf(name, std::ios::binary);
     if(!inf)
         return 1;
     raw_header hd;
